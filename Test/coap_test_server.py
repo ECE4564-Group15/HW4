@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import pickle
 
 import asyncio
 
@@ -11,20 +12,24 @@ import aiocoap
 class VariableResource(resource.Resource):
     def __init__(self):
         super(VariableResource, self).__init__()
-        self.content = 0
+        self.content = (0,)
 
     async def render_get(self, req):
-        return aiocoap.Message(payload=self.content)
+        p = pickle.dumps(self.content)
+        print("GET Received. Sending %s"%self.content)
+        return aiocoap.Message(payload=p)
 
     async def render_put(self, req):
-        print('PUT Payload: %s' % req.payload)
-        temp = int(req.payload)
+        temp = pickle.loads(req.payload)
+        print('PUT Payload: %s' % str(temp))
         if temp is None:
             e = "Expecting integer. Did not modify resource."
+            e = pickle.dumps(e)
             return aiocoap.Message(payload=e)
         else:
             self.content = temp
-            return aiocoap.Message(payload=self.content)
+            temp = pickle.dumps(self.content)
+            return aiocoap.Message(payload=temp)
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger("coap-test-server").setLevel(logging.DEBUG)
