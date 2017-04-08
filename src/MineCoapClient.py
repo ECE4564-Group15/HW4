@@ -16,15 +16,21 @@ import asyncio
 class CoapClient():
     #ctor
     def __init__(self):
-        pass
+        self.run = asyncio.get_event_loop().run_until_complete
     
-    async def connect(self):
+    #this must be run immediatly after init in order to operate
+    async def do_connect(self):
         self.proto = await Context.create_client_context()
-        print('Connected')
-        
-    async def do_get(self,uri):
-        req = Message(code=GET,uri=uri)
 
+    def connect(self):
+        self.run(self.do_connect())        
+        print('Connected')
+
+    #perform a get
+    async def do_get(self,uri):
+        #message object
+        req = Message(code=GET,uri=uri)
+        #perform request
         try:
             res = await self.proto.request(req).response
         except TypeError as e:
@@ -34,13 +40,17 @@ class CoapClient():
             print(e)
             return None
         finally:
+            #get the result
             p = pickle.loads(res.payload)
             return p
 
+    #perfor a put
     async def do_put(self,uri,data):
+        #encode the data
         p = pickle.dumps(data)
+        #create message
         req = Message(code=PUT,uri=uri,payload=p)
-
+        #perform the request
         try:
             res = await self.proto.request(req).response
         except TypeError as e:
@@ -50,27 +60,27 @@ class CoapClient():
             print(e)
             return None
         finally:
+            #return data
             p = pickle.loads(res.payload)
             return p
+    #public wrappers
+    def get(self,uri):
+        return self.run(self.do_get(uri))
 
-    async def get(self,uri):
-        return await self.do_get(uri)
+    def put(self,uri,data):
+        return self.run(self.do_put(uri,data))
 
-    async def put(self,uri,data):
-        return await self.do_put(uri,data)
-
+#test program if this is run standalone
 if __name__ == '__main__':
-    run = asyncio.get_event_loop().run_until_complete
-    
     c = CoapClient()
-    run(c.connect())
+    c.connect()
     uri = 'coap://localhost/id'
-    t = run(c.get(uri))
+    t = c.get(uri)
     print('Got %s'%t)
     uri = 'coap://localhost/mine'
-    t = run(c.get(uri))
+    t = c.get(uri)
     print('Got %s'%t)
     t.pop('id')
     t['type'] = 'yellow'
-    t = run(c.put(uri,t))
+    t = c.put(uri,t)
     print(t)
