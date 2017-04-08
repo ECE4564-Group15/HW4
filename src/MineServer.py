@@ -7,6 +7,7 @@
 
 #imports
 from aiocoap import *
+import aiocoap.resource as resource
 import pickle
 import logging
 import asyncio
@@ -19,15 +20,21 @@ class IdResource(resource.Resource):
     #ctor
     def __init__(self):
         super(IdResource, self).__init__()
-        self.currentId = 0
+        self.currentId = 1
 
     #handler
     async def render_get(self, req):
         #response
-        if self.currentId >= 3:
-            p = pickle.dumps(int(-1))
+        if self.currentId >= 4:
+            self.currentId = int(-1)
+            p = pickle.dumps(self.currentId)
+            print('GET: Reply with %s'%self.currentId)
+        elif self.currentId < 0:
+            p = pickle.dumps(self.currentId)
+            print('GET: Reply with %s'%self.currentId)
         else:
             p = pickle.dumps(self.currentId)
+            print('GET: Reply with %s'%self.currentId)
             self.currentId = self.currentId + 1
         return Message(payload=p)
 
@@ -38,13 +45,41 @@ class MinecraftResource(resource.Resource):
         super(MinecraftResource, self).__init__()
         #data
         self.numblocks = 0
-        self.position = {'x':0,'y':0,'z':0,'id':0}
+        self.position = {'x':0,'y':0,'z':0,'id':1}
         
     async def render_get(self, req):
         #response
         p = pickle.dumps(self.position)
-        print('GET: Reply with %s'%self.position)
+        #print('GET: Reply with %s'%self.position)
         return Message(payload=p)
+
+    async def render_put(self, req):
+        #message
+        message = pickle.loads(req.payload)
+        if all(k in message for k in ('x','y','z','type')):
+            #then good
+            #put_block(message)
+            print('Placed: %s'%message)
+            #put block down... increment by one, set positiono
+            self.numblocks = self.numblocks + 1
+            #next client
+            if self.position['id'] < 3:
+                self.position['id'] = self.position['id'] + 1
+            else:
+                self.position['id'] = 1
+            #next pos
+            if self.numblocks >= 20:
+                self.position['id'] = 0
+            elif self.position['x'] < 9:
+                self.position['x'] = self.position['x'] + 1
+            elif self.position['z'] < 1:
+                self.position['x'] = 0
+                self.position['z'] = self.position['z'] + 1
+            p = pickle.dumps(True)
+            return Message(payload=p)
+        else:
+            p = pickle.dumps(False)
+            return Message(payload=p)
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('mine-server').setLevel(logging.DEBUG)
@@ -54,11 +89,11 @@ def main():
 
         root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
 
-        root.add_resource(('minecraft',), MinecraftResource())
+        root.add_resource(('mine',), MinecraftResource())
 
         root.add_resource(('id',), IdResource())
 
-        asyncio.Task(aiocoap.Context.create_server_context(root))
+        asyncio.Task(Context.create_server_context(root))
 
         asyncio.get_event_loop().run_forever()
 if __name__ == '__main__':
