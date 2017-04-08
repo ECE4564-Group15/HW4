@@ -15,6 +15,8 @@ class VariableResource(resource.Resource):
         self.content = (0,)
 
     async def render_get(self, req):
+        for f in req.opt.option_list():
+            print(f)
         p = pickle.dumps(self.content)
         print("GET Received. Sending %s"%self.content)
         return aiocoap.Message(payload=p)
