@@ -12,8 +12,12 @@ def main():
 	#set a block at certain position
 	stone = 1
 	grass = 2
+        tnt = 46
+        
+        #set block to specific position
 	mc.setBlock(x+1,y,z,stone)
 	mc.setBlock(x+2,y,z,grass)
+        mc.setBlock(x+3,y,z,tnt)
 
 	#set player position
 	mc.setPlayerPosition(x+1, y, z)
