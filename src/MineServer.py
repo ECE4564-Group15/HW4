@@ -12,6 +12,7 @@ import pickle
 import logging
 import asyncio
 from MinecraftAPI import MinecraftAPI
+import time
 
 #HERE WE WILL INCLUDE SimpleMineApi.py (needs to be able to place block and get location) (maybe move cursor to new location)
 
@@ -61,6 +62,7 @@ class MinecraftResource(resource.Resource):
         #message
         message = pickle.loads(req.payload)
         if all(k in message for k in ('x','y','z','type')):
+            time.sleep(1)
             #build stuff
             x = message['x'] + self.playerPosition['x']
             y = message['y'] + self.playerPosition['y']
