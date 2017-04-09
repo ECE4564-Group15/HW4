@@ -18,7 +18,7 @@ def main():
         base_uri = 'coap://' + sys.argv[1] + '/'
     #base_uri = 'coap://localhost/' if len(sys.argv) < 2 else ('coap://' + sys.argv[1] + '/')
     id_uri = base_uri + 'id'
-    mine_uri = base_uri + 'mine'
+    m_uri = base_uri + 'mine'
     #get the id
     my_id = client.get(id_uri)
     colors = ['','blue','red','yellow']
