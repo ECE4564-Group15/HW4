@@ -11,6 +11,7 @@ import aiocoap.resource as resource
 import pickle
 import logging
 import asyncio
+from MinecraftAPI import MinecraftAPI
 
 #HERE WE WILL INCLUDE SimpleMineApi.py (needs to be able to place block and get location) (maybe move cursor to new location)
 
@@ -46,7 +47,10 @@ class MinecraftResource(resource.Resource):
         #data
         self.numblocks = 0
         self.position = {'x':0,'y':0,'z':0,'id':1}
-        
+        self.mc = MinecraftAPI()
+        x, y, z = self.mc.getPlayerPosition()
+        self.playerPosition = {'x':x, 'y':y ,'z':z}
+
     async def render_get(self, req):
         #response
         p = pickle.dumps(self.position)
@@ -57,6 +61,20 @@ class MinecraftResource(resource.Resource):
         #message
         message = pickle.loads(req.payload)
         if all(k in message for k in ('x','y','z','type')):
+            #build stuff
+            x = message['x'] + self.playerPosition['x']
+            y = message['y'] + self.playerPosition['y']
+            z = message['z'] + self.playerPosition['z']
+            if message['type'] == 'yellow':
+                stone = 1
+                self.mc.setBlock(x, y, z, stone)
+            elif message['type'] == 'blue':
+                grass = 2
+                self.mc.setBlock(x, y, z, grass)
+            elif message['type'] == 'red':
+                tnt = 46
+                self.mc.setBlock(x, y, z, tnt)
+            
             #then good
             #put_block(message)
             print('Placed: %s'%message)
@@ -72,9 +90,9 @@ class MinecraftResource(resource.Resource):
                 self.position['id'] = 0
             elif self.position['x'] < 9:
                 self.position['x'] = self.position['x'] + 1
-            elif self.position['z'] < 1:
+            elif self.position['y'] < 1:
                 self.position['x'] = 0
-                self.position['z'] = self.position['z'] + 1
+                self.position['y'] = self.position['y'] + 1
             p = pickle.dumps(True)
             return Message(payload=p)
         else:
