@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from MineCoapClient import CoapClient
+import sys
 import asyncio
 
 def main():
@@ -14,7 +15,7 @@ def main():
     else:
         base_uri = 'coap://' + sys.argv[1] + '/'
     id_uri = base_uri + 'id'
-    mine_uri = base_uri + 'mine'
+    m_uri = base_uri + 'mine'
     #id_uri = 'coap://localhost/id'
     #m_uri = 'coap://localhost/mine'
     
