@@ -8,8 +8,16 @@ def main():
     #must run
     client.connect()
     #id
-    id_uri = 'coap://localhost/id'
-    m_uri = 'coap://localhost/mine'
+    if len(sys.argv) < 2:
+        print('No host specified. Assuming localhost')
+        base_uri = 'coap://localhost/'
+    else:
+        base_uri = 'coap://' + sys.argv[1] + '/'
+    id_uri = base_uri + 'id'
+    mine_uri = base_uri + 'mine'
+    #id_uri = 'coap://localhost/id'
+    #m_uri = 'coap://localhost/mine'
+    
     #get the id
     my_id = client.get(id_uri)
     colors = ['','blue','red','yellow']
