@@ -118,9 +118,9 @@ def LED(color) :
    os.system("echo 0 >/sys/class/gpio/gpio17/value")
    os.system("echo 0 >/sys/class/gpio/gpio19/value")
    os.system("echo 0 >/sys/class/gpio/gpio21/value")
-   if color == 'green': # green
-       os.system("echo 1 >/sys/class/gpio/gpio19/value")
-   if color 'yellow': # yellow
+   if color == 'blue': # blue
+       os.system("echo 1 >/sys/class/gpio/gpio17/value")
+   if color == 'yellow': # yellow
        os.system("echo 1 >/sys/class/gpio/gpio19/value")
        os.system("echo 1 >/sys/class/gpio/gpio21/value")
    if color == 'red':  # red
