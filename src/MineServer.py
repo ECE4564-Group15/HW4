@@ -64,6 +64,7 @@ class MinecraftResource(resource.Resource):
         if all(k in message for k in ('x','y','z','type')):
             time.sleep(1)
             #build stuff
+            LED(message['type'])
             x = message['x'] + self.playerPosition['x']
             y = message['y'] + self.playerPosition['y']
             z = message['z'] + self.playerPosition['z']
@@ -76,7 +77,7 @@ class MinecraftResource(resource.Resource):
             elif message['type'] == 'red':
                 tnt = 46
                 self.mc.setBlock(x, y, z, tnt)
-            
+
             #then good
             #put_block(message)
             print('Placed: %s'%message)
@@ -104,7 +105,30 @@ class MinecraftResource(resource.Resource):
 logging.basicConfig(level=logging.INFO)
 logging.getLogger('mine-server').setLevel(logging.DEBUG)
 
+
+def init__LED():
+    os.system("echo 17 > /sys/class/gpio/export || true") # blue
+    os.system("echo 19 > /sys/class/gpio/export || true") # green
+    os.system("echo 21 > /sys/class/gpio/export || true") # red
+    os.system("echo out > /sys/class/gpio/gpio17/direction")
+    os.system("echo out > /sys/class/gpio/gpio19/direction")
+    os.system("echo out > /sys/class/gpio/gpio21/direction")
+
+def LED(color) :
+   os.system("echo 0 >/sys/class/gpio/gpio17/value")
+   os.system("echo 0 >/sys/class/gpio/gpio19/value")
+   os.system("echo 0 >/sys/class/gpio/gpio21/value")
+   if color == 'green': # green
+       os.system("echo 1 >/sys/class/gpio/gpio19/value")
+   if color 'yellow': # yellow
+       os.system("echo 1 >/sys/class/gpio/gpio19/value")
+       os.system("echo 1 >/sys/class/gpio/gpio21/value")
+   if color == 'red':  # red
+       os.system("echo 1 >/sys/class/gpio/gpio21/value")
+
 def main():
+        init__LED()
+
         root = resource.Site()
 
         root.add_resource(('.well-known', 'core'), resource.WKCResource(root.get_resources_as_linkheader))
