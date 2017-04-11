@@ -13,6 +13,7 @@ import logging
 import asyncio
 from MinecraftAPI import MinecraftAPI
 import time
+import os
 
 #HERE WE WILL INCLUDE SimpleMineApi.py (needs to be able to place block and get location) (maybe move cursor to new location)
 
@@ -84,6 +85,7 @@ class MinecraftResource(resource.Resource):
             #put block down... increment by one, set positiono
             self.numblocks = self.numblocks + 1
             #next client
+            
             if self.position['id'] < 3:
                 self.position['id'] = self.position['id'] + 1
             else:
@@ -91,11 +93,15 @@ class MinecraftResource(resource.Resource):
             #next pos
             if self.numblocks >= 20:
                 self.position['id'] = 0
+                print('Finished!')
             elif self.position['x'] < 9:
                 self.position['x'] = self.position['x'] + 1
             elif self.position['y'] < 1:
                 self.position['x'] = 0
                 self.position['y'] = self.position['y'] + 1
+
+            
+            
             p = pickle.dumps(True)
             return Message(payload=p)
         else:
