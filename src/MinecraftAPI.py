@@ -29,3 +29,5 @@ class MinecraftAPI():
 	def setPlayerPosition(self ,x ,y ,z):
 		self.mineObj.player.setPos(x, y, z)
 
+	def postToChat(str):
+		self.mineObj.postToChat(str)

@@ -94,6 +94,7 @@ class MinecraftResource(resource.Resource):
             if self.numblocks >= 20:
                 self.position['id'] = 0
                 print('Finished!')
+                self.mc.postToChat('Wall finished!')
             elif self.position['x'] < 9:
                 self.position['x'] = self.position['x'] + 1
             elif self.position['y'] < 1:

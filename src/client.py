@@ -26,6 +26,7 @@ def main():
         #get current id
         pos = client.get(m_uri)
         if pos['id'] == 0:
+            print ("finished!!")
             break
         elif pos['id'] != my_id:
             continue
